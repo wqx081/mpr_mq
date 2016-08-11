@@ -1,13 +1,18 @@
 #include "server/amqp/amqp_server.h"
+#include "threading/thread.h"
 
 #include <limits>
 #include <memory>
+#include <algorithm>
 
 namespace server {
 
 AmqpServer::AmqpServer(const std::string& server_def)
     : server_def_(server_def),
-      state_(NEW) {}
+      state_(NEW),
+      total_tasks_(0),
+      thread_factory_(make_unique<threading::PosixThreadFactory>()){
+}
 
 AmqpServer::~AmqpServer() {
   Stop();
@@ -18,7 +23,7 @@ AmqpServer::~AmqpServer() {
 
 Status AmqpServer::Init() {
   std::lock_guard<std::mutex> l(mu_);
-  //
+  // TODO
   // parse server_def_, get the needed infomation 
   // init the services
   return Status::OK();
@@ -30,6 +35,18 @@ Status AmqpServer::Start() {
   switch (state_) {
     case NEW: {
       // Start the serivce run in new thread
+      for (ServiceExecutorIterator it = service_executor_list_.begin();
+           it != service_executor_list_.end();
+           ++it) {
+        std::shared_ptr<threading::Thread> thread = thread_factory_->NewThread(*it);
+        thread_pool_.insert(thread);
+      }
+      for (std::set<std::shared_ptr<threading::Thread>>::iterator thread = thread_pool_.begin();
+           thread != thread_pool_.end();
+           ++thread) {
+        (*thread)->Start();
+      }
+
       state_ = STARTED;
       LOG(INFO) << "Started server with target: " << target();
       return Status::OK();
@@ -74,8 +91,13 @@ Status AmqpServer::Join() {
       return Status::OK();
     case STARTED:
     case STOPPED:
-      // TODO:
-      // reset
+      // reset and Join
+      {
+        threading::Synchronized s(monitor_);
+        while (total_tasks_ > 0) {
+          monitor_.Wait();
+        }
+      }
       return Status::OK();
     default:
       CHECK(false);
@@ -85,8 +107,34 @@ Status AmqpServer::Join() {
 }
 
 const std::string AmqpServer::target() const {
-  //TODO
   return "amqp://localhost";
+}
+
+Status AmqpServer::InsertAsyncService(std::shared_ptr<AsyncServiceInterface> service) {
+  std::lock_guard<std::mutex> l(mu_);
+  for (ServiceExecutorIterator it = service_executor_list_.begin();
+       it != service_executor_list_.end();
+       ++it) {
+    if ((*it)->service() == service) {
+      return Status(base::Code::ALREADY_EXISTS, "service already existed");
+    }
+  }
+  service_executor_list_.push_back(std::make_shared<ServiceExecutor>(service, monitor_, total_tasks_));
+  total_tasks_++;
+  return Status::OK();
+}
+
+Status AmqpServer::RemoveAsyncService(std::shared_ptr<AsyncServiceInterface> service) {
+  std::lock_guard<std::mutex> l(mu_);
+  for (ServiceExecutorIterator it = service_executor_list_.begin();
+       it != service_executor_list_.end();
+       ++it) {
+    if ((*it)->service() == service) {
+      total_tasks_--;
+      service_executor_list_.erase(it);
+    }
+  }
+  return Status::OK();
 }
 
 // static

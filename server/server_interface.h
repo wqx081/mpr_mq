@@ -1,11 +1,10 @@
 #ifndef SERVER_SERVER_INTERFACE_H_
 #define SERVER_SERVER_INTERFACE_H_
-
 #include <memory>
 
 #include "base/status.h"
 #include "base/macros.h"
-
+#include "server/async_service_interface.h"
 
 namespace server {
 
@@ -19,8 +18,11 @@ class ServerInterface {
   virtual Status Start() = 0;
   virtual Status Stop() = 0;
   virtual Status Join() = 0;
-
   virtual const std::string target() const = 0;
+  
+  // Use this before Start, Stop() and Join()
+  virtual Status InsertAsyncService(std::shared_ptr<AsyncServiceInterface> service) = 0;
+  virtual Status RemoveAsyncService(std::shared_ptr<AsyncServiceInterface> service) = 0;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(ServerInterface);

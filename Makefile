@@ -25,6 +25,13 @@ CPP_SOURCES := \
 	./base/time.cc	\
 	\
 	\
+	\
+	threading/monitor.cc	\
+	threading/mutex.cc	\
+	threading/thread_factory.cc	\
+	threading/thread_manager.cc	\
+	threading/time_util.cc	\
+	\
 	./server/server_interface.cc \
 	./server/amqp/amqp_server.cc \
 
@@ -32,7 +39,9 @@ CPP_OBJECTS := $(CPP_SOURCES:.cc=.o)
 
 
 TESTS := \
-	./receive \
+	./send \
+	\
+	./amqp_consumer_server \
 
 
 all: $(CPP_OBJECTS) $(TESTS)
@@ -40,14 +49,24 @@ all: $(CPP_OBJECTS) $(TESTS)
 	@echo "  [CXX]  $@"
 	@$(CXX) $(CXXFLAGS) $@ $<
 
-receive: ./receive..o
+send: ./send.o
 	@echo "  [LINK] $@"
 	@$(CXX) -o $@ $< $(CPP_OBJECTS) $(LIB_FILES)
-./receive..o: ./receive.cc
-	$(CXX) $(CXXFLAGS) $@ $<
+./send.o: ./send.cc
+	@echo "  [CXX]  $@"
+	@$(CXX) $(CXXFLAGS) $@ $<
+
+./amqp_consumer_server: ./server/amqp/amqp_consumer_server.o
+	@echo "  [LINK] $@"
+	@$(CXX) -o $@ $< $(CPP_OBJECTS) $(LIB_FILES)
+./server/amqp/amqp_consumer_server.o: ./server/amqp/amqp_consumer_server.cc
+	@echo "  [CXX]  $@"
+	@$(CXX) $(CXXFLAGS) $@ $<
 
 clean:
 	rm -fr base/*.o
 	rm -fr *.o
+	rm -fr ./server/*.o
+	rm -fr ./server/amqp/*.o
 	@rm -fr $(TESTS)
 	@rm -fr $(CPP_OBJECTS)
