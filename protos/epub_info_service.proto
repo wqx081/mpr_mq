@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package epub_info;
+
+message GetEpubCatalogRequest {
+  int64 book_id = 1;
+  string book_path = 2;
+}
+
+message GetEpubCatalogResponse {
+  string catalog_path = 1;  
+}
+
+service EpubInfo {
+  rpc GetEpubCatalog(GetEpubCatalogRequest) returns (GetEpubCatalogResponse);  
+};

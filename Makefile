@@ -1,8 +1,17 @@
 CXXFLAGS += -std=c++11
 CXXFLAGS += -I./
+CXXFLAGS += -I./third_party/rapidjson/include/
 CXXFLAGS += -std=c++11 -Wall -g -c -o
 
 LIB_FILES :=-lglog -lgflags -levent -lamqp-cpp -lpthread \
+	-L/usr/local/lib `pkg-config --libs grpc++ grpc` \
+	-lgrpc++_reflection \
+	-lprotobuf -lpthread -ldl
+
+PROTOC = protoc
+GRPC_CPP_PLUGIN=grpc_cpp_plugin
+GRPC_CPP_PLUGIN_PATH ?= `which $(GRPC_CPP_PLUGIN)`
+PROTOS_PATH = ./protos
 
 CPP_SOURCES := \
 	./base/ascii_ctype.cc	\
@@ -62,6 +71,8 @@ send: ./send.o
 ./server/amqp/amqp_consumer_server.o: ./server/amqp/amqp_consumer_server.cc
 	@echo "  [CXX]  $@"
 	@$(CXX) $(CXXFLAGS) $@ $<
+
+############ rpc
 
 clean:
 	rm -fr base/*.o

@@ -34,13 +34,11 @@ class WrapperEventBase {
 
 AsyncServiceInterface* NewAmqpConsumer(const std::string& info);
 
-// AmqpConsumerServiceStragey
-class AmqpConsumerServiceHandler {
+// ServiceStragey
+class ServiceHandler {
  public:
-  virtual ~AmqpConsumerServiceHandler() {}
-  virtual void Handle(const AMQP::Message& message, 
-                      uint64_t delivery_tag, 
-                      bool redelivered) = 0;
+  virtual ~ServiceHandler() {}
+  virtual Status Handle(const std::string& message, const std::string* reply=nullptr) = 0;
 };
 
 class AmqpConsumerService : public AsyncServiceInterface {
@@ -70,7 +68,7 @@ class AmqpConsumerService : public AsyncServiceInterface {
         [=] (const AMQP::Message& message, uint64_t delivery_tag, bool redelivered) {
       LOG(INFO) << "Received message: " << message.message();
       if (this->handler_) {
-        this->handler_->Handle(message, delivery_tag, redelivered);
+        this->handler_->Handle(message.message());
       } else {
         LOG(INFO) << "No consumer Handler";
       }
@@ -95,7 +93,7 @@ class AmqpConsumerService : public AsyncServiceInterface {
   const std::string queue_name_;
 
   WrapperEventBase event_base_;
-  AmqpConsumerServiceHandler* handler_;
+  ServiceHandler* handler_;
 };
 
 } // namespace server

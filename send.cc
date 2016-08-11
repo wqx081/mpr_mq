@@ -24,8 +24,7 @@ int main(int argc, char** argv) {
   AMQP::TcpChannel channel(&c);
 
   channel.declareQueue("hello_queue");
-
-  channel.publish("", "hello_queue", "hi it's me");
+  channel.publish("", "hello_queue", "{\"book_id\":\"12345642\", \"book_path\":\"/tmp/epub/\"}");
 
   timeout = event_new(evbase, -1, EV_TIMEOUT, timeout_cb, nullptr);
   struct timeval future_time;
