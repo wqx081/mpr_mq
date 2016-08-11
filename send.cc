@@ -9,9 +9,15 @@
 
 #include <memory>
 
+static void timeout_cb(int /* fd */, short /* event */, void* /* arg */) {
+  //LOG(INFO) << "--timeout_cb";
+  exit(1);
+}
+
 int main(int argc, char** argv) {
   google::ParseCommandLineFlags(&argc, &argv, true);
 
+  struct event* timeout;
   auto evbase = ::event_base_new();
   AMQP::LibEventHandler handler(evbase);
   AMQP::TcpConnection c(&handler, AMQP::Address("amqp://fb04/"));  
@@ -21,7 +27,14 @@ int main(int argc, char** argv) {
 
   channel.publish("", "hello_queue", "hi it's me");
 
-  //::event_base_dispatch(evbase);
+  timeout = event_new(evbase, -1, EV_TIMEOUT, timeout_cb, nullptr);
+  struct timeval future_time;
+  future_time.tv_sec = 3;
+  future_time.tv_usec = 0;
+
+  event_add(timeout, &future_time);
+
+  ::event_base_dispatch(evbase);
   ::event_base_free(evbase);
 
   return 0;
