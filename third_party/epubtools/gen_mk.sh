@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # Author: wang qixiang (wangqx@mpreader.com)
 
 if [ -z "$1" ]; then
@@ -31,5 +30,15 @@ echo "================="
 echo "$HEADERS"
 
 
-echo ""
+echo "+++++++++++++"
+
+#makefile template
+cat << EOF
+APP=@APP
+CXXFLAGS=@CXXFLAGS
+LIB_FILES=@LIB_FILES
+
+
+EOF
+
 echo "Done."
