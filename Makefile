@@ -5,7 +5,28 @@ CXXFLAGS += -std=c++11 -Wall -g -c -o
 LIB_FILES :=-lglog -lgflags -levent -lamqp-cpp -lpthread \
 
 CPP_SOURCES := \
-
+	./base/ascii_ctype.cc	\
+	./base/file.cc	\
+	./base/file_enumerator.cc \
+	./base/file_path.cc	\
+	./base/file_util.cc	\
+	./base/location.cc	\
+	./base/numbers.cc	\
+	./base/once.cc	\
+	./base/pickle.cc	\
+	./base/ref_counted.cc	\
+	./base/scoped_file.cc	\
+	./base/scoped_temp_dir.cc	\
+	./base/status.cc \
+	./base/string_encode.cc	\
+	./base/string_piece.cc	\
+	./base/string_printf.cc	\
+	./base/string_util.cc	\
+	./base/time.cc	\
+	\
+	\
+	./server/server_interface.cc \
+	./server/amqp/amqp_server.cc \
 
 CPP_OBJECTS := $(CPP_SOURCES:.cc=.o)
 
@@ -20,15 +41,13 @@ all: $(CPP_OBJECTS) $(TESTS)
 	@$(CXX) $(CXXFLAGS) $@ $<
 
 receive: ./receive..o
-	$(CXX) -o $@ $< $(LIB_FILES)
+	@echo "  [LINK] $@"
+	@$(CXX) -o $@ $< $(CPP_OBJECTS) $(LIB_FILES)
 ./receive..o: ./receive.cc
 	$(CXX) $(CXXFLAGS) $@ $<
 
 clean:
 	rm -fr base/*.o
-	rm -fr threading/*.o
-	rm -fr zip/*.o
-	rm -fr crypto/*.o
 	rm -fr *.o
 	@rm -fr $(TESTS)
 	@rm -fr $(CPP_OBJECTS)
