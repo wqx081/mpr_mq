@@ -8,6 +8,8 @@
 
 #include "TEpubArchiveSource.h"
 #include "ZipArchiveReader.h"
+#include <string.h>
+#include <stdlib.h>
 
 TEpubArchiveSource::TEpubArchiveSource(const std::string& archivePath, const std::string& epubPath, unsigned char key[32], int keyType)
     : m_archivePath(archivePath)

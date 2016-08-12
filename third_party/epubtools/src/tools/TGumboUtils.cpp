@@ -7,6 +7,8 @@
 //
 
 #include "TGumboUtils.hpp"
+#include <string.h>
+#include <stdlib.h>
 
 
 void TGumboUtils::FindNode(GumboNode *parent, GumboTag tag, GumboNode **findedNode)

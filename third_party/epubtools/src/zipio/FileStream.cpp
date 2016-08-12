@@ -1,6 +1,8 @@
 ﻿#include "FileStream.h"
 #include "TUtf8Util.h"
 
+#include <stdlib.h>
+#include <string.h>
 
 #ifdef _WIN32
 

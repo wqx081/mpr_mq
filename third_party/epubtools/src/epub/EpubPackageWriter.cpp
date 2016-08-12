@@ -13,6 +13,7 @@
 #include "TPathUtil.h"
 #include "TXMLWriter.h"
 #include <stdlib.h>
+#include <string.h>
 
 
 EpubPackageWriter::EpubPackageWriter(EpubPackage *package)

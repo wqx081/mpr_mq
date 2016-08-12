@@ -16,6 +16,8 @@
 #include <sys/stat.h>
 #endif
 #include <assert.h>
+#include <string.h>
+#include <stdlib.h>
 
 
 std::vector<std::string> TDirUtil::listAllFile(const std::string& dirPath)

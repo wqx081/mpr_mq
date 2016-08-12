@@ -10,6 +10,8 @@
 #include "gumbo.h"
 #include "TStringUtils.h"
 #include "TPathUtil.h"
+#include <string.h>
+#include <stdlib.h>
 
 
 static inline std::string htmlResourceTypeWithFileExtension(const std::string& extension)
