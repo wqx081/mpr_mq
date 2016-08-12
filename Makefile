@@ -3,11 +3,11 @@ CXXFLAGS += -I./
 CXXFLAGS += -I./third_party/rapidjson/include/
 CXXFLAGS += -std=c++11 -Wall -g -c -o
 
-#-lz -lmxml -lgumbo -lssl -lpthread
 LIB_FILES :=-lglog -lgflags -levent -lamqp-cpp -lpthread \
 	-L/usr/local/lib -lgrpc++ -lgrpc \
 	-lgrpc++_reflection \
-	-lprotobuf -lpthread -ldl
+	-lprotobuf -lpthread -ldl \
+	-lmysqlclient
 
 EPUB_INFO_LIBS=./third_party/epubtools/libepubtools.a -lz -lmxml -lgumbo -lssl -lpthread
 
@@ -43,6 +43,27 @@ CPP_SOURCES := \
 	threading/thread_factory.cc	\
 	threading/thread_manager.cc	\
 	threading/time_util.cc	\
+	\
+	\
+	./db/common/connection_info.cc \
+	./db/common/connection_pool.cc \
+	./db/common/connection_manager.cc \
+	./db/backend/db_result.cc \
+	./db/backend/db_statement.cc \
+	./db/backend/db_connection.cc \
+	./db/backend/connector_interface.cc \
+	\
+	./db/drivers/mysql/mysql_connector.cc \
+	./db/drivers/mysql/mysql_direct_result.cc \
+	./db/drivers/mysql/mysql_direct_statement.cc \
+	./db/drivers/mysql/mysql_prepared_result.cc \
+	./db/drivers/mysql/mysql_prepared_statement.cc \
+	./db/drivers/mysql/mysql_connection.cc \
+	\
+	./db/frontend/result.cc \
+	./db/frontend/statement.cc \
+	./db/frontend/session.cc \
+	./db/frontend/transaction.cc \
 	\
 	\
 	./server/server_interface.cc \
