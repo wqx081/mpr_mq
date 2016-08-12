@@ -3,10 +3,13 @@ CXXFLAGS += -I./
 CXXFLAGS += -I./third_party/rapidjson/include/
 CXXFLAGS += -std=c++11 -Wall -g -c -o
 
+#-lz -lmxml -lgumbo -lssl -lpthread
 LIB_FILES :=-lglog -lgflags -levent -lamqp-cpp -lpthread \
-	-L/usr/local/lib `pkg-config --libs grpc++ grpc` \
+	-L/usr/local/lib -lgrpc++ -lgrpc \
 	-lgrpc++_reflection \
 	-lprotobuf -lpthread -ldl
+
+EPUB_INFO_LIBS=./third_party/epubtools/libepubtools.a -lz -lmxml -lgumbo -lssl -lpthread
 
 PROTOC = protoc
 GRPC_CPP_PLUGIN=grpc_cpp_plugin
@@ -41,8 +44,16 @@ CPP_SOURCES := \
 	threading/thread_manager.cc	\
 	threading/time_util.cc	\
 	\
+	\
 	./server/server_interface.cc \
 	./server/amqp/amqp_server.cc \
+	\
+	\
+	./protos/epub_info.pb.cc \
+	./protos/epub_info.grpc.pb.cc \
+	\
+	./service/rpc_epub_info_handler.cc \
+
 
 CPP_OBJECTS := $(CPP_SOURCES:.cc=.o)
 
@@ -51,6 +62,8 @@ TESTS := \
 	./send \
 	\
 	./amqp_consumer_server \
+	\
+	./epub_info_service \
 
 
 all: $(CPP_OBJECTS) $(TESTS)
@@ -72,6 +85,26 @@ send: ./send.o
 	@echo "  [CXX]  $@"
 	@$(CXX) $(CXXFLAGS) $@ $<
 
+./epub_info_service: ./rpc/epub_info_service/epub_info_service.o
+	@echo "  [LINK] $@"
+	@$(CXX) -o $@ $< $(CPP_OBJECTS) $(LIB_FILES) $(EPUB_INFO_LIBS)
+./rpc/epub_info_service/epub_info_service.o: ./rpc/epub_info_service/epub_info_service.cc
+	@echo "  [CXX]  $@"
+	@$(CXX) $(CXXFLAGS) $@ $<
+
+
+vpath %.proto $(PROTOS_PATH)
+
+.PRECIOUS: %.grpc.pb.cc
+%.grpc.pb.cc: %.proto
+	@echo "  [GEN]  $@"
+	@$(PROTOC) -I $(PROTOS_PATH) --grpc_out=$(PROTOS_PATH) --plugin=protoc-gen-grpc=$(GRPC_CPP_PLUGIN_PATH) $<
+
+.PRECIOUS: %.pb.cc
+%.pb.cc: %.proto
+	@echo "  [GEN]  $@"
+	@$(PROTOC) -I $(PROTOS_PATH) --cpp_out=$(PROTOS_PATH) $<
+
 ############ rpc
 
 clean:
@@ -79,5 +112,9 @@ clean:
 	rm -fr *.o
 	rm -fr ./server/*.o
 	rm -fr ./server/amqp/*.o
+	rm -fr ./protos/*.o 
+	rm -fr ./protos/*.pb.cc 
+	rm -fr ./protos/*.pb.h
+	rm -fr ./rpc/epub_info_service/*.o
 	@rm -fr $(TESTS)
 	@rm -fr $(CPP_OBJECTS)

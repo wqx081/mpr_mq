@@ -22,7 +22,7 @@ EpubInfo::EpubInfo(const std::string& filePath)
 {
     mEpubSource = new TEpubArchiveSource(filePath);
     mPackage = new EpubPackage(mEpubSource);
-    mPackage->Open();
+    mOpenFlag = mPackage->Open();
     
     //init catalog
     ParseNav();
@@ -38,6 +38,11 @@ EpubInfo::~EpubInfo()
 {
     delete mPackage;
     delete mEpubSource;
+}
+
+bool EpubInfo::IsValid() const
+{
+    return mOpenFlag;
 }
 
 int EpubInfo::GetSectionCount() const

@@ -1,6 +1,7 @@
 #ifndef SERVER_AMQP_CONSUMER_SERVICE_H_
 #define SERVER_AMQP_CONSUMER_SERVICE_H_
 #include "base/macros.h"
+#include "base/status.h"
 
 #include <event2/event.h>
 #include <amqpcpp.h>
@@ -9,6 +10,8 @@
 #include <functional>
 #include <string>
 #include "server/async_service_interface.h"
+
+#include <glog/logging.h>
 
 namespace server {
 
@@ -34,13 +37,6 @@ class WrapperEventBase {
 
 AsyncServiceInterface* NewAmqpConsumer(const std::string& info);
 
-// ServiceStragey
-class ServiceHandler {
- public:
-  virtual ~ServiceHandler() {}
-  virtual Status Handle(const std::string& message, const std::string* reply=nullptr) = 0;
-};
-
 class AmqpConsumerService : public AsyncServiceInterface {
  public:
   AmqpConsumerService(const std::string& address,
@@ -51,12 +47,9 @@ class AmqpConsumerService : public AsyncServiceInterface {
       handler_(nullptr){
   }
 
-  virtual ~AmqpConsumerService() {
-    
-  }
+  virtual ~AmqpConsumerService() {}
 
-  void Shutdown() override {
-  }
+  void Shutdown() override {}
 
   void HandleLoop() override {
     AMQP::LibEventHandler event_handler(event_base_.get());
@@ -68,7 +61,8 @@ class AmqpConsumerService : public AsyncServiceInterface {
         [=] (const AMQP::Message& message, uint64_t delivery_tag, bool redelivered) {
       LOG(INFO) << "Received message: " << message.message();
       if (this->handler_) {
-        this->handler_->Handle(message.message());
+        std::string reply;
+        this->handler_->Handle(message.message(), &reply);
       } else {
         LOG(INFO) << "No consumer Handler";
       }
@@ -80,15 +74,11 @@ class AmqpConsumerService : public AsyncServiceInterface {
     ::event_base_dispatch(event_base_.get());
   }
 
+  virtual void SetHandler(ServiceHandler* handler) override {
+    handler_ = handler;  
+  }
+
  private:  
-#if 0
-  std::string host_;
-  uint16_t port_;
-  std::string vhost_;
-  
-  std::string username_;
-  std::string password_;
-#endif
   const std::string address_; // "amqp://"
   const std::string queue_name_;
 

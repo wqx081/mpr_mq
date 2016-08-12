@@ -2,6 +2,7 @@
 #include "base/status.h"
 #include "server/server_interface.h"
 #include "service/amqp_consumer_service.h"
+#include "service/rpc_epub_info_handler.h"
 
 #include <gflags/gflags.h>
 
@@ -19,12 +20,10 @@ int main(int argc, char** argv) {
  
   //TODO
   std::shared_ptr<server::AsyncServiceInterface> epub_info_service = 
-     std::make_shared<server::AmqpConsumerService>("amqp://fb04/", "hello_queue");
-  //std::shared_ptr<server::AsyncServiceInterface> epub_splitter_service = nullptr;
-  //std::shared_ptr<server::AsyncServiceInterface> video_process_service = nullptr;
+     std::make_shared<server::AmqpConsumerService>("amqp://fb04/", "epub_info_queue");
+  epub_info_service->SetHandler(new server::RpcEpubInfoServiceHandler("localhost:50051"));
+
   server->InsertAsyncService(epub_info_service);
-  //server->InsertAsyncService(epub_splitter_service);
-  //server->InsertAsyncService(video_process_service);
 
 //
   server->Start();

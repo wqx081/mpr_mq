@@ -23,8 +23,8 @@ int main(int argc, char** argv) {
   AMQP::TcpConnection c(&handler, AMQP::Address("amqp://fb04/"));  
   AMQP::TcpChannel channel(&c);
 
-  channel.declareQueue("hello_queue");
-  channel.publish("", "hello_queue", "{\"book_id\":\"12345642\", \"book_path\":\"/tmp/epub/\"}");
+  channel.declareQueue("epub_info_queue");
+  channel.publish("", "epub_info_queue", "{\"book_id\":\"12333333333345642\", \"book_path\":\"/tmp/1.epub\"}");
 
   timeout = event_new(evbase, -1, EV_TIMEOUT, timeout_cb, nullptr);
   struct timeval future_time;

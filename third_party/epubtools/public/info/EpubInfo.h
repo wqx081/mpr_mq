@@ -25,6 +25,8 @@ public:
     EpubInfo(const std::string& filePath);
     ~EpubInfo();
     
+    bool IsValid() const;
+    
     int GetSectionCount() const;
     const std::vector<CatalogItem>& GetCatalogs() const;
     const std::vector<ISLIMark>& GetISLIMarks() const;
@@ -47,6 +49,7 @@ private:
     TEpubSource *mEpubSource;
     std::vector<CatalogItem> mCatalogs;
     std::vector<ISLIMark> mISLIMarks;
+    bool mOpenFlag;
 };
 
 #endif /* EpubInfo_h */
