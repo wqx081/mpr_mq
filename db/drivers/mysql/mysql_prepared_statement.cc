@@ -11,12 +11,22 @@ MysqlPreparedStatement::MysqlPreparedStatement(const std::string& query,
   fmt_.imbue(std::locale::classic());    
 
   native_statement_ = ::mysql_stmt_init(connection);
-  DCHECK(native_statement_);
-  DCHECK(::mysql_stmt_prepare(native_statement_,
-			      query.c_str(),
-			      query.size()) == 0);
-  params_count_ = ::mysql_stmt_param_count(native_statement_);
-  ResetData();
+
+  try {
+    if (!native_statement_) {
+      throw MysqlException(" Failed to create a statement");
+    }
+    if (mysql_stmt_prepare(native_statement_, query.c_str(), query.size())) {
+      throw MysqlException(mysql_stmt_error(native_statement_));
+    }
+    params_count_ = mysql_stmt_param_count(native_statement_);
+    ResetData();
+  } catch (...) {
+    if (native_statement_) {
+      mysql_stmt_close(native_statement_);
+    }
+    throw;
+  }
 }
 
 MysqlPreparedStatement::~MysqlPreparedStatement() {
@@ -91,7 +101,9 @@ uint64_t MysqlPreparedStatement::Affected() {
 
 MysqlPreparedResult* MysqlPreparedStatement::Query() {
   BindAll();
-  DCHECK(::mysql_stmt_execute(native_statement_) == 0);
+  if (mysql_stmt_execute(native_statement_)) {
+    throw MysqlException(mysql_stmt_error(native_statement_));
+  }
   return new MysqlPreparedResult(native_statement_);
 }
 
@@ -105,11 +117,10 @@ void MysqlPreparedStatement::Execute() {
     throw MysqlException(::mysql_stmt_error(native_statement_));
   }
 
-  //TODO
   MYSQL_RES* r = ::mysql_stmt_result_metadata(native_statement_);
   if (r) {
     ::mysql_free_result(r);
-    //throw MysqlException("Calling Execute() on query!");
+    throw MysqlException("Calling Execute() on query!");
   }
 }
 

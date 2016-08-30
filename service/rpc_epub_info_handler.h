@@ -3,6 +3,8 @@
 #include "base/macros.h"
 #include "base/status.h"
 
+#include "db/frontend/session.h"
+
 #include "service/amqp_consumer_service.h"
 
 #include <memory>
@@ -14,7 +16,9 @@ namespace server {
 
 class RpcEpubInfoServiceHandler : public ServiceHandler {
  public:
-  RpcEpubInfoServiceHandler(const std::string& address);
+  RpcEpubInfoServiceHandler(const std::string& address,
+                            const std::string& db_connection);
+
   virtual ~RpcEpubInfoServiceHandler() {} 
 
   // From AmqpConsumerServiceHandler
@@ -31,6 +35,8 @@ class RpcEpubInfoServiceHandler : public ServiceHandler {
   const std::string address_; // "host:port"
   std::unique_ptr<epub_info::EpubInfo::Stub> stub_; 
   std::shared_ptr<grpc::Channel> channel_;
+  
+  const std::string db_connection_info_;
 
   void Init();
 };

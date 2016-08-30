@@ -28,51 +28,22 @@ typedef BasicStringPiece<std::string> StringPiece;
 namespace internal {
 
 void CopyToString(const StringPiece& self, std::string* target);
-
 void AppendToString(const StringPiece& self, std::string* target);
 
- size_t copy(const StringPiece& self,
-                        char* buf,
-                        size_t n,
-                        size_t pos);
- size_t find(const StringPiece& self,
-                        const StringPiece& s,
-                        size_t pos);
- size_t find(const StringPiece& self,
-                        char c,
-                        size_t pos);
- size_t rfind(const StringPiece& self,
-                         const StringPiece& s,
-                         size_t pos);
- size_t rfind(const StringPiece& self,
-                         char c,
-                         size_t pos);
- size_t find_first_of(const StringPiece& self,
-                                 const StringPiece& s,
-                                 size_t pos);
- size_t find_first_not_of(const StringPiece& self,
-                                     const StringPiece& s,
-                                     size_t pos);
- size_t find_first_not_of(const StringPiece& self,
-                                     char c,
-                                     size_t pos);
- size_t find_last_of(const StringPiece& self,
-                                const StringPiece& s,
-                                size_t pos);
- size_t find_last_of(const StringPiece& self,
-                                char c,
-                                size_t pos);
+size_t copy(const StringPiece& self, char* buf, size_t n, size_t pos);
+size_t find(const StringPiece& self, const StringPiece& s, size_t pos);
+size_t find(const StringPiece& self, char c, size_t pos);
+size_t rfind(const StringPiece& self, const StringPiece& s, size_t pos);
+size_t rfind(const StringPiece& self, char c, size_t pos);
+size_t find_first_of(const StringPiece& self, const StringPiece& s, size_t pos);
+size_t find_first_not_of(const StringPiece& self, const StringPiece& s, size_t pos);
+size_t find_first_not_of(const StringPiece& self, char c, size_t pos);
+size_t find_last_of(const StringPiece& self, const StringPiece& s, size_t pos);
+size_t find_last_of(const StringPiece& self, char c, size_t pos);
+size_t find_last_not_of(const StringPiece& self, const StringPiece& s, size_t pos);
+size_t find_last_not_of(const StringPiece& self, char c, size_t pos);
+StringPiece substr(const StringPiece& self, size_t pos, size_t n);
 
- size_t find_last_not_of(const StringPiece& self,
-                                    const StringPiece& s,
-                                    size_t pos);
- size_t find_last_not_of(const StringPiece& self,
-                                    char c,
-                                    size_t pos);
-
- StringPiece substr(const StringPiece& self,
-                               size_t pos,
-                               size_t n);
 }  // namespace internal
 
 // BasicStringPiece ------------------------------------------------------------
@@ -292,7 +263,7 @@ extern template class  BasicStringPiece<std::string>;
 
 // StingPiece operators --------------------------------------------------------
 
- bool operator==(const StringPiece& x, const StringPiece& y);
+bool operator==(const StringPiece& x, const StringPiece& y);
 
 inline bool operator!=(const StringPiece& x, const StringPiece& y) {
   return !(x == y);
@@ -317,8 +288,8 @@ inline bool operator>=(const StringPiece& x, const StringPiece& y) {
 }
 
 
- std::ostream& operator<<(std::ostream& o,
-                                     const StringPiece& piece);
+std::ostream& operator<<(std::ostream& o,
+                         const StringPiece& piece);
 
 // Hashing ---------------------------------------------------------------------
 

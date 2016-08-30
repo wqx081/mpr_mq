@@ -72,15 +72,23 @@ CPP_SOURCES := \
 	\
 	./protos/epub_info.pb.cc \
 	./protos/epub_info.grpc.pb.cc \
+	./protos/crypto_server.pb.cc \
+	./protos/crypto_server.grpc.pb.cc \
+	./protos/transcode.pb.cc \
+	./protos/transcode.grpc.pb.cc \
 	\
 	./service/rpc_epub_info_handler.cc \
+	./service/rpc_transcoder_handler.cc \
 
 
 CPP_OBJECTS := $(CPP_SOURCES:.cc=.o)
 
 
 TESTS := \
+	./base/file_path_unittest \
+	\
 	./send \
+	./send_trancode \
 	\
 	./amqp_consumer_server \
 	\
@@ -92,10 +100,26 @@ all: $(CPP_OBJECTS) $(TESTS)
 	@echo "  [CXX]  $@"
 	@$(CXX) $(CXXFLAGS) $@ $<
 
+./base/file_path_unittest: ./base/file_path_unittest.o
+	@echo "  [LINK] $@"
+	@$(CXX) -o $@ $< $(CPP_OBJECTS) $(LIB_FILES) -L/usr/local/lib -lgtest -lgtest_main -lpthread
+./base/file_path_unittest.o: ./base/file_path_unittest.cc
+	@echo "  [CXX]  $@"
+	@$(CXX) $(CXXFLAGS) $@ $<
+
+## /////////////////////////////
+
 send: ./send.o
 	@echo "  [LINK] $@"
 	@$(CXX) -o $@ $< $(CPP_OBJECTS) $(LIB_FILES)
 ./send.o: ./send.cc
+	@echo "  [CXX]  $@"
+	@$(CXX) $(CXXFLAGS) $@ $<
+
+send_trancode: ./send_trancode.o
+	@echo "  [LINK] $@"
+	@$(CXX) -o $@ $< $(CPP_OBJECTS) $(LIB_FILES)
+./send_trancode.o: ./send_trancode.cc
 	@echo "  [CXX]  $@"
 	@$(CXX) $(CXXFLAGS) $@ $<
 

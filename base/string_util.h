@@ -27,6 +27,8 @@ template<typename Char> struct CaseInsensitiveCompareASCII {
 
 bool LowerCaseEqualsASCII(StringPiece str, StringPiece lowercase_ascii);
 
+int CompareCaseInsensitiveASCII(StringPiece a, StringPiece b);
+
 enum class CompareCase {
   SENSITIVE,
   INSENSITIVE_ASCII,

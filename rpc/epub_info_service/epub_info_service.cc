@@ -34,6 +34,8 @@ class EpubInfoServiceImpl final : public epub_info::EpubInfo::Service {
     (void) context;
     int64_t book_id = request->book_id();
     std::string book_path = request->book_path();
+    std::string catalog_path = request->catalog_path();
+
     LOG(INFO) << "book_id: " << book_id << ", book_path: " << book_path;
 
     base::FilePath epub_path(book_path);
@@ -46,8 +48,7 @@ class EpubInfoServiceImpl final : public epub_info::EpubInfo::Service {
       return Status(grpc::StatusCode::INTERNAL, "epub library can't not handler file: " + book_path);
     }
 
-    // /path/to/epub/xxxx.epub -> /path/to/epub/xxxx.info
-    base::FilePath info_path(epub_path.ReplaceExtension("info"));
+    base::FilePath info_path(catalog_path);
     
     auto catalogs = epub_info.GetCatalogs();
 

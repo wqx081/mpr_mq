@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package transcoder;
+
+message AudioData {
+  string sample = 1;
+}
+
+message VideoData {
+  string frame_size = 1;
+  string frame_aspect = 2;
+  string frame_rate = 3;
+  string rate_bit = 4;
+}
+
+message SegmentData {
+  string time = 1;
+  string url_prefix = 2;
+  string m3u8_name = 3;
+}
+
+message TranscodeRequest {
+  string media_source_path = 1;
+  string media_target_path = 2;
+  AudioData audio_data = 3;
+  VideoData video_data = 4;
+  SegmentData segment_data = 5;
+}
+
+//frame,1274
+//fps,136
+//q,-1.0
+//Lsize,6241kB
+//time,00:00:50.98
+//bitrate,1002.7kbits/s
+//speed,5.42x
+
+message TranscodeResponse {
+  string frame = 1;
+  string fps = 2;
+  string size = 3;
+  string time = 4;
+  string bitrate = 5;
+  string speed = 6;
+  string duration = 7;
+  string out_time = 8;
+}
+
+service Transcoder {
+  rpc Transcode(TranscodeRequest) returns (stream TranscodeResponse) {}
+}

@@ -20,7 +20,7 @@ int main(int argc, char** argv) {
   struct event* timeout;
   auto evbase = ::event_base_new();
   AMQP::LibEventHandler handler(evbase);
-  AMQP::TcpConnection c(&handler, AMQP::Address("amqp://fb04/"));  
+  AMQP::TcpConnection c(&handler, AMQP::Address("amqp://guest:guest@172.16.2.109/"));  
   AMQP::TcpChannel channel(&c);
 
   channel.declareQueue("epub_info_queue");

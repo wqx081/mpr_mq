@@ -5,6 +5,7 @@ package epub_info;
 message GetEpubCatalogRequest {
   int64 book_id = 1;
   string book_path = 2;
+  string catalog_path = 3;
 }
 
 message GetEpubCatalogResponse {

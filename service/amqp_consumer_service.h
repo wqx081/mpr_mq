@@ -20,11 +20,9 @@ class WrapperEventBase {
   WrapperEventBase() : event_base_(::event_base_new()) {
     DCHECK(event_base_);
   }
-
   event_base* get() {
     return event_base_;
   }
-
   ~WrapperEventBase() {
     ::event_base_free(event_base_);
   }
